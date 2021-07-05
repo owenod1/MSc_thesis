@@ -1,7 +1,7 @@
 # MSc_thesis
 Code used for MSc thesis 
 
-MSc_equation.py contains all the functions used, prerequisite files for MSc_equation.py are CMOD5.N.py and CMOD_IFR2.py
+MSc_equation.py contains all the functions used in MSc.py, prerequisite files for MSc_equation.py are CMOD5.N.py and CMOD_IFR2.py
 
 MSc.py loads the radar data, applies MSc_equations and prints/plots results 
 
