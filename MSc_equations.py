@@ -559,7 +559,7 @@ def scale_bar(ax, length=None, location=(0.5, 0.05), linewidth=5):
 #%% Apply CMOD5.n on rotated image
 
 def applyCMOD(NRCS, phi, incidence, iterations, samplerate = 50, CMOD5 = False, plotting = False):
-    import cmod5_test
+    import CMOD5.N
     
     """
     code retrieved from 
@@ -586,7 +586,7 @@ def applyCMOD_IFR2(NRCS, phi, incidence, iterations, samplerate = 50, plotting =
     import CMOD_IFR2
     
     """
-    fucntion to call CMOD IFR 2
+    function to call CMOD IFR 2
     
     code skeleton retrieved from 
     https://gitlab.tudelft.nl/drama/stereoid/-/blob/a8a31da38369a326a5172d76a51d73bba8bc2d58/stereoid/oceans/cmod5n.py
