@@ -15,7 +15,7 @@ import cv2
 from scipy import ndimage
 os.chdir('C:/Python/AAA_GRS2/mscthesis')
 
-import youngs_equations as yg
+import MSc_equations as msc
 
 #%% things to improve
 
@@ -52,8 +52,8 @@ incident_angle = netcdf_file['incident_angle'][:]
 
 # compute sample rate and range/azimuth look angle
 pi = 3.1415926535
-samplerate = yg.sampleRate(longitude,latitude)
-rangeLookAngle = yg.calculate_initial_compass_bearing((latitude[0,0],longitude[0,0]),(latitude[0,-1],longitude[0,-1]))
+samplerate = msc.sampleRate(longitude,latitude)
+rangeLookAngle = msc.calculate_initial_compass_bearing((latitude[0,0],longitude[0,0]),(latitude[0,-1],longitude[0,-1]))
 azimuthAngle = rangeLookAngle - 90
 
 
@@ -63,13 +63,13 @@ if azimuthAngle <=0:
 # load and visualise entire radar image    
 Sigma0_VV_original = np.array(Sigma0_VV_original_preclip)
 incident_original = np.array(incident_angle)
-yg.plottings(Sigma0_VV_original, samplerate[1], title = 'NRCS  $\sigma_0$')
+msc.plottings(Sigma0_VV_original, samplerate[1], title = 'NRCS  $\sigma_0$')
 
 
 #%% apply low pass filter to image if swell is significant
 
-# Sigma0_VV = yg.lowpass(Sigma0_VV, 51, samplerate[1]*3, samplerate[1], cmap = 'Greys_r', plotting = True)
-Sigma0_VV_original = yg.lowpass(Sigma0_VV_original, 51, samplerate[1]*12, samplerate[1], cmap = 'Greys_r', plotting = True)
+# Sigma0_VV = msc.lowpass(Sigma0_VV, 51, samplerate[1]*3, samplerate[1], cmap = 'Greys_r', plotting = True)
+Sigma0_VV_original = msc.lowpass(Sigma0_VV_original, 51, samplerate[1]*12, samplerate[1], cmap = 'Greys_r', plotting = True)
 
 #%% tiled calculations 
 
@@ -91,14 +91,14 @@ form = 'cells'
 wind_origin, mean_lon, mean_lat, u_star, z_0, sigma_u1, sigma_u2, L1, L2, L3, w_star2, w_star2_std, Zi_estimated,\
     corr_fact1, corr_fact2, windspeed, tiles_lon, tiles_lat, idxKeep_tiles, hold_prediction, hold_form, epsilon,\
         H, dissip_rate_loop2B \
-    = yg.tiledWind(Sigma0_VV_original, incident_original, longitude, latitude, iterations = 15, size = size, \
+    = msc.tiledWind(Sigma0_VV_original, incident_original, longitude, latitude, iterations = 15, size = size, \
                     dissip_rate = dissip_rate, slope_multiplier = slope_multiplier, w_star_threshold = w_star_threshold, \
                         Zi_input = Zi, True_wind = True_wind, form = form, samplerate = samplerate[1], plotting = False)
 
 # wind_origin, mean_lon, mean_lat, u_star, z_0, sigma_u1, sigma_u2, L1, L2, L3, w_star2, w_star2_std, Zi_estimated,\
 #     corr_fact1, corr_fact2, windspeed, tiles_lon, tiles_lat, idxKeep_tiles, hold_prediction, hold_form, epsilon,\
 #         H, dissip_rate_loop2B \
-#     = yg.tiledWind(Sigma0_VV, incident, lon, lat, iterations = 15, size = size, \
+#     = msc.tiledWind(Sigma0_VV, incident, lon, lat, iterations = 15, size = size, \
 #                     dissip_rate = dissip_rate, slope_multiplier = slope_multiplier, w_star_threshold = w_star_threshold, \
 #                         Zi_input = Zi, True_wind = True_wind, form = 'cells', samplerate = samplerate[1], plotting = False)
 
@@ -163,13 +163,13 @@ tiles_left = np.size(wind_origin2)-sum(np.isnan(wind_origin2))
 tiles_classified = np.size(Zi_estimated)-sum(np.isnan(Zi_estimated))
 print('Tiles: %1.1i ' %np.size(L2))
 print('Tiles left: %1.1i ' %tiles_left)
-print('wind direction: %1.1f ' %np.nanmedian(wind_origin2) + '$\pm$ %1.1f' %yg.MAD(wind_origin2))
-print('wind speed: %1.1f ' %np.nanmedian(windspeed) + '$\pm$ %1.1f' %yg.MAD(windspeed))
-print('Zi: %1.1i ' %np.nanmedian(Zi_estimated) + '$\pm$ %1.1i' %yg.MAD(Zi_estimated))
-print('u_star: %1.3f ' %np.nanmedian(u_star) + '$\pm$ %1.3f' %yg.MAD(u_star)) 
-print('sigma_u2: %1.3f ' %np.nanmedian(sigma_u2) + '$\pm$ %1.3f' %yg.MAD(sigma_u2))
-print('L2: %1.1i ' %np.nanmedian(L2) + '$\pm$ %1.1i' %yg.MAD(L2))
-print('H: %1.3f ' %np.nanmedian(H) + '$\pm$ %1.3f' %yg.MAD(H))
+print('wind direction: %1.1f ' %np.nanmedian(wind_origin2) + '$\pm$ %1.1f' %msc.MAD(wind_origin2))
+print('wind speed: %1.1f ' %np.nanmedian(windspeed) + '$\pm$ %1.1f' %msc.MAD(windspeed))
+print('Zi: %1.1i ' %np.nanmedian(Zi_estimated) + '$\pm$ %1.1i' %msc.MAD(Zi_estimated))
+print('u_star: %1.3f ' %np.nanmedian(u_star) + '$\pm$ %1.3f' %msc.MAD(u_star)) 
+print('sigma_u2: %1.3f ' %np.nanmedian(sigma_u2) + '$\pm$ %1.3f' %msc.MAD(sigma_u2))
+print('L2: %1.1i ' %np.nanmedian(L2) + '$\pm$ %1.1i' %msc.MAD(L2))
+print('H: %1.3f ' %np.nanmedian(H) + '$\pm$ %1.3f' %msc.MAD(H))
 print('Form: %1.3f ' %(np.nansum(hold_form)/tiles_classified))
 print('Prediction: %1.2f ' %np.nanmean(hold_prediction) + '$\pm$ %1.2f' %np.nanstd(hold_prediction))
 print('ratio: %1.3f' %np.nanmedian(sigma_u2/u_star))
@@ -196,14 +196,14 @@ netcdf_file = nc.Dataset(path, 'r', format='NETCDF4')
 wind_ocn = netcdf_file['vv_001_owiWindSpeed'][:]
 direction_pre_ovn = np.array(netcdf_file['vv_001_owiWindDirection'][:])
 direction_ocn = np.array(netcdf_file['vv_001_owiWindDirection'][:])[:,direction_pre_ovn[0,:]!=-999]
-direction_ocn_median, direction_MAD_ocn  = np.median(direction_ocn), yg.MAD(direction_ocn)
+direction_ocn_median, direction_MAD_ocn  = np.median(direction_ocn), msc.MAD(direction_ocn)
 longitude_wind = np.array(netcdf_file['lon'][:])
 latitude_wind = np.array(netcdf_file['lat'][:])
-samplerate_wind = yg.sampleRate(longitude_wind,latitude_wind)
+samplerate_wind = msc.sampleRate(longitude_wind,latitude_wind)
 windspeed2 = np.array(wind_ocn)
 windspeed2 = windspeed2[:,windspeed2[0,:]!=-999]
-yg.plottings(windspeed2, samplerate_wind[1], title = 'S1 OCN windspeed data [m/s]', cmap = 'jet')
-yg.plottings(direction_ocn, samplerate_wind[1], title = 'S1 OCN wind direction [deg]', cmap = 'Reds')
+msc.plottings(windspeed2, samplerate_wind[1], title = 'S1 OCN windspeed data [m/s]', cmap = 'jet')
+msc.plottings(direction_ocn, samplerate_wind[1], title = 'S1 OCN wind direction [deg]', cmap = 'Reds')
 
 # ecmwf_barbedos_east1  ecmwf_barbedos_east5     ecmwf_barbedos_southeast3
 # ecmwf_barbedos_jan15b  ecmwf_barbedos_jan25a    ecmwf_barbedos_jan25b
@@ -217,14 +217,14 @@ netcdf_file = nc.Dataset(path, 'r', format='NETCDF4')
 
 wind_ecmwf = netcdf_file['vv_001_owiEcmwfWindSpeed'][:]
 direction_ecmwf = np.array(netcdf_file['vv_001_owiEcmwfWindDirection'][:])
-direction_ecmwf_median, direction_MAD_ecmwf  = np.median(direction_ecmwf), yg.MAD(direction_ecmwf)
+direction_ecmwf_median, direction_MAD_ecmwf  = np.median(direction_ecmwf), msc.MAD(direction_ecmwf)
 longitude_wind = np.array(netcdf_file['lon'][:])
 latitude_wind = np.array(netcdf_file['lat'][:])
-samplerate_wind = yg.sampleRate(longitude_wind,latitude_wind)
+samplerate_wind = msc.sampleRate(longitude_wind,latitude_wind)
 windspeed3 = np.array(wind_ecmwf)
 windspeed3 = windspeed3[:,windspeed3[0,:]!=-999]
-yg.plottings(windspeed3, samplerate_wind[1], title = 'OCN windspeed data [m/s]', cmap = 'jet')
-yg.plottings(np.array(netcdf_file['vv_001_owiEcmwfWindDirection'][:]), samplerate_wind[1], title = 'ECMWF wind direction [deg]', cmap = 'Reds')
+msc.plottings(windspeed3, samplerate_wind[1], title = 'OCN windspeed data [m/s]', cmap = 'jet')
+msc.plottings(np.array(netcdf_file['vv_001_owiEcmwfWindDirection'][:]), samplerate_wind[1], title = 'ECMWF wind direction [deg]', cmap = 'Reds')
 
 
 print(r'OCN Wind origin w.r.t. North: %1.1f degrees' %direction_ocn_median + '+- %1.1f degrees' %direction_MAD_ocn)
@@ -267,31 +267,31 @@ Sigma0_VV = Sigma0_VV_original[int(beginy//n):int(endy//n),int(beginx//n):int(en
 incident = incident_original[int(beginy//n):int(endy//n),int(beginx//n):int(endx//n)]           #[0000//n:400//n,0000//n:400//n]
 lat = latitude[int(beginy//n):int(endy//n),int(beginx//n):int(endx//n)]         #[000//n:400//n,0000//n:400//n]
 lon = longitude[int(beginy//n):int(endy//n),int(beginx//n):int(endx//n)]    
-yg.plottings(Sigma0_VV, samplerate[1], title = 'Subset NRCS  $\sigma_0$')
+msc.plottings(Sigma0_VV, samplerate[1], title = 'Subset NRCS  $\sigma_0$')
 
 #%% spatial smoothing or low pass filter
 
-Sigma0_VV = yg.lowpass(Sigma0_VV, 101, samplerate[1]*12, samplerate[1], cmap = 'Greys_r', plotting = True)
+Sigma0_VV = msc.lowpass(Sigma0_VV, 101, samplerate[1]*12, samplerate[1], cmap = 'Greys_r', plotting = True)
 
 #%% calculate angle for alongwind rotation through PSD analysis
 
 # load image and create Hamming window
 image = Sigma0_VV
-hamming_window = yg.HammingWindow(image)
+hamming_window = msc.HammingWindow(image)
 
 # Filter image by dividing by longwave components and then apply Hamming window
-image_longwave = yg.longWaveFilter(image, samplerate[1])
+image_longwave = msc.longWaveFilter(image, samplerate[1])
 image_filtered = (image-image_longwave)/image_longwave*hamming_window #(image-image_longwave)/image_longwave*hamming_window
-yg.plottings(image_filtered, samplerate[1], title = 'Longwave filtered and Hamming windowed input image')
+msc.plottings(image_filtered, samplerate[1], title = 'Longwave filtered and Hamming windowed input image')
 
 # calculate 2D PSD for resulting image and apply Gaussian filter to Power Spectrum for smoothing
-psd2D = yg.twoDPS(image_filtered, samplerate[1], True)
+psd2D = msc.twoDPS(image_filtered, samplerate[1], True)
 psd2D_filtered = ndimage.gaussian_filter(psd2D,3)
-yg.plottings(10*np.log10(psd2D_filtered), samplerate[1], minP = 95, maxP = 99.9, unit = 'frequency', title = 'Gaussian filtered 2D spectrum, [dB]', cmap = 'viridis')
-# yg.circ()
+msc.plottings(10*np.log10(psd2D_filtered), samplerate[1], minP = 95, maxP = 99.9, unit = 'frequency', title = 'Gaussian filtered 2D spectrum, [dB]', cmap = 'viridis')
+# msc.circ()
 
-angle_spectra, data_fitted, _ = yg.peakShortwave(psd2D_filtered, samplerate[1], True)
-# _, angle_wind = yg.GaussFit(psd2D_filtered, 0.005, samplerate[1], True)
+angle_spectra, data_fitted, _ = msc.peakShortwave(psd2D_filtered, samplerate[1], True)
+# _, angle_wind = msc.GaussFit(psd2D_filtered, 0.005, samplerate[1], True)
 
 
 #%% calculate wind origine and angle for best spectra
@@ -329,26 +329,26 @@ rotation = abs(wind_origin_spectra - rangeLookAngle) % 180 * -1*  np.sign(wind_o
 image = Sigma0_VV    #   Sigma0_VV     Sigma0_VV_filt
 
 # rotate image such that East West is along wind
-image_rot =  yg.rotateAndClip(image, rotation, samplerate[1], True)
-incident_angle_rotated = yg.rotateAndClip(incident, rotation, samplerate[1])
+image_rot =  msc.rotateAndClip(image, rotation, samplerate[1], True)
+incident_angle_rotated = msc.rotateAndClip(incident, rotation, samplerate[1])
 
 # submit into CMOD for windspeed 
-windspeed = yg.applyCMOD(image_rot, wind_origin_spectra - rangeLookAngle, incident_angle_rotated, 15, samplerate[1], False, True)
-# windspeed = yg.applyCMOD_IFR2(image_rot, wind_origin - rangeLookAngle, incident_angle_rotated, 15, samplerate[1], True)
+windspeed = msc.applyCMOD(image_rot, wind_origin_spectra - rangeLookAngle, incident_angle_rotated, 15, samplerate[1], False, True)
+# windspeed = msc.applyCMOD_IFR2(image_rot, wind_origin - rangeLookAngle, incident_angle_rotated, 15, samplerate[1], True)
 
-# surface_stress0, friction_velocity0, z_00, Cdn0 = yg.loop1(windspeed)
-# surface_stress, friction_velocity, z_0, Cdn, windfield, Charnock = yg.loop1_charnocks(windspeed, Cdn0)
+# surface_stress0, friction_velocity0, z_00, Cdn0 = msc.loop1(windspeed)
+# surface_stress, friction_velocity, z_0, Cdn, windfield, Charnock = msc.loop1_charnocks(windspeed, Cdn0)
 
 
 variance_multiplier = 1.0 # !!!
 windspeed = (windspeed - np.mean(windspeed)) * variance_multiplier + np.mean(windspeed)
     
 #Calculate along wind spectrum of boundary layer
-along_wind_psd = yg.psd1D(windspeed, samplerate[1], plotting = True, windowed = True, scaled = False, normalised = True)
-variance_psd = yg.psd1D(windspeed, samplerate[1], plotting = True, windowed = True, scaled = False, normalised = False)
+along_wind_psd = msc.psd1D(windspeed, samplerate[1], plotting = True, windowed = True, scaled = False, normalised = True)
+variance_psd = msc.psd1D(windspeed, samplerate[1], plotting = True, windowed = True, scaled = False, normalised = False)
 
 # determine spectral peak to find MABL depth 
-Zi, powerlaw, smoothed_spectrum, peak_idx, x_axis, index2range, PSD = yg.sikora1997(windspeed, 
+Zi, powerlaw, smoothed_spectrum, peak_idx, x_axis, index2range, PSD = msc.sikora1997(windspeed, 
             samplerate[1], window_length = 5, smoothing_fact = 1.5, windowed = True, plotting = True)
 
 print('Zi: %1.1i metres' %Zi)
@@ -623,7 +623,7 @@ print('L loop C: %1.3f m' %D_L[-1])
 print('sigma_u loop C: %1.3f m/s' %sigma_u)
 
 idx_ll = None 
-sigma_u2, L2, D_etha, D_etha_std, corr_fact2 = yg.loop2C(windspeed, friction_velocity, Zi, Cdn, PSD, samplerate[1], inertial_max, idx_ll, form = 'form')
+sigma_u2, L2, D_etha, D_etha_std, corr_fact2 = msc.loop2C(windspeed, friction_velocity, Zi, Cdn, PSD, samplerate[1], inertial_max, idx_ll, form = 'form')
 
 #%% determination of validation sigma_u
 
@@ -674,7 +674,7 @@ ax.set_extent(extent)
 # ax.set_global()
 ax.gridlines()
 
-yg.scale_bar(ax, 100)
+msc.scale_bar(ax, 100)
 
 ax.quiver(mean_lon, mean_lat, v, u, scale=14, transform = crs)
 plt.show()
