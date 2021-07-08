@@ -831,70 +831,6 @@ def loop1(windfield):
     return surface_stress, friction_velocity, z_0, Cdn
 
 
-#%% adapted first loop of Young's to recalculate wind field
-
-def loop1_charnocks(windfield, Cdn0):
-    """
-    First loop of Young's approach. Calculates surface stress Tau , friction velocity u* and roughness length z_0
-    based on neutral wind speed input'
-    
-    input:
-        windfield: 2D array with neutral 10 metre windspeeds in m/s
-        
-    output:
-        surface_stress: surface stress field Tau
-        friction velocity: u* in m/s
-        friction length: z_0 in m
-        neutral drag coefficient: C_dn
-    """
-    
-    # define constants
-    karman = 0.40                           # Karman constant
-    g = 9.8                                 # Gravitational acceleration, m/s**2
-    z = 10                                  # measurements height, 10 metres for CMOD5.N 
-    rho_air = 1.2                           # kg/m**3, 1.2 for 20 degrees, 1.25 for 10 degreess                           
-    T = 20                                  # temperature in Celcius
-    
-    # calculate new Charnock constant as a range between 0.011 and 0.040 depending on gradient of windfield
-    gradients = np.gradient(windfield)
-    gradient  = np.sqrt(gradients[0]**2 + gradients[1]**2)
-    # normalised_gradient = (gradient-np.nanmin(gradient)) / (np.nanmax(gradient)-np.nanmin(gradient))
-    normalised_gradient = (windfield-np.nanmin(windfield)) / (np.nanmax(windfield)-np.nanmin(windfield))
-    plottings(normalised_gradient)
-    Charnock1 = normalised_gradient * (0.040-0.011) + 0.011
-    plottings(Charnock1)
-    # kinematic viscosity of air
-    nu = 1.326 * 10**(-5) *(1 + (6.542 * 10**(-3))* T + (8.301 * 10**(-6)) * T**2 - (4.840 * 10**(-9)) * T**3) # m**2/s
-    
-    # prepare loop of 10 iterations
-    iterations = 10
-    A_friction_velocity = np.ones_like(windfield)    # m/s
-    A_Cdn = np.ones_like(windfield)
-    A_z_0 = np.ones_like(windfield)
-
-    for i in range(iterations):
-        if i > 0:
-            A_friction_velocity = np.sqrt(A_Cdn * windfield**2)
-            A_z_0 = (Charnock1 * A_friction_velocity**2) / g + 0.11 * nu / A_friction_velocity
-            A_Cdn = (karman / np.log(z / A_z_0))**2
-    
-    Cdn0 = Cdn0
-    Cdn = A_Cdn
-    
-    # calculate surface stress as using Cdn0 which uses Charnock= 0.011
-    surface_stress = rho_air * Cdn0 * windfield**2 
-    # recalculate wind field using Cdn which uses Charnock = [0.011, 0.040] as a function of wind speed slope
-    windfield = np.sqrt(surface_stress / (rho_air * Cdn))
-    surface_stress = rho_air * Cdn * windfield**2 
-    
-    # save friction velocity and friction length based on mean stress field and neutral drag coefficient
-    friction_velocity = np.sqrt(np.mean(surface_stress) / rho_air)
-    z_0 = np.mean((Charnock1 * friction_velocity**2) / g + 0.11 * nu / friction_velocity)
-    Cdn = A_Cdn
-    
-    return surface_stress, friction_velocity, z_0, Cdn, windfield, Charnock1
-
-
 #%% Loop 2A
 
 def loop2A(windfield, surface_stress, friction_velocity, z_0, Zi):
@@ -1434,7 +1370,6 @@ def tiledWind(NRCS, incidence, longitude, latitude, iterations, size, dissip_rat
                """
                # loop 1
                tau, u_star, z_0, Cdn = loop1(windspeed)
-               # tau, u_star, z_0, Cdn, windspeed = loop1_charnocks(windspeed, Cdn)
                
                # loop 2A
                sigma_u1, L1, B1, w_star1, corr_fact1 = loop2A(windspeed, tau, u_star, z_0, Zi)
