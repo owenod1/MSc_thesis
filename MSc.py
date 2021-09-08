@@ -98,7 +98,7 @@ form = 'rolls' # convection form, either cells or rolls
 # main script available in MSc_equations
 wind_origin, mean_lon, mean_lat, u_star, z_0, sigma_u1, sigma_u2, L1, L2, L3, w_star2, w_star2_std, Zi_estimated,\
     corr_fact1, corr_fact2, windspeed, tiles_lon, tiles_lat, idxKeep_tiles, hold_prediction, hold_form, epsilon,\
-        H, dissip_rate_loop2B \
+        H\
     = msc.tiledWind(Sigma0_VV_original, incident_original, longitude, latitude, iterations = 15, size = size, \
                     dissip_rate = dissip_rate, slope_multiplier = slope_multiplier, w_star_threshold = w_star_threshold, \
                         Zi_input = Zi, True_wind = True_wind, form = form, samplerate = samplerate[1], plotting = False)
