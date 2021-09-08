@@ -502,7 +502,7 @@ def scale_bar(ax, length=None, location=(0.5, 0.05), linewidth=5):
 #%% Apply CMOD5.n on rotated image
 
 def applyCMOD(NRCS, phi, incidence, iterations, samplerate = 50, CMOD5 = False, plotting = False):
-    import cmod5_test
+    import CMOD5N
     
     """
     code retrieved from 
@@ -512,7 +512,7 @@ def applyCMOD(NRCS, phi, incidence, iterations, samplerate = 50, CMOD5 = False, 
     """
     
     # estimate windspeed using CMOD function
-    windspeed = cmod5_test.cmod5n_inverse(NRCS, phi, incidence, CMOD5, iterations = iterations)
+    windspeed = CMOD5N.cmod5n_inverse(NRCS, phi, incidence, CMOD5, iterations = iterations)
 
     # plot windspeed
     if plotting == True:
