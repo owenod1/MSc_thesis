@@ -3,6 +3,15 @@
 Created on Thu Mar  4 08:41:49 2021
 
 @author: Owen O'Driscoll
+
+This is the main python processing script containing the following steps
+1. manually load SAR data
+2 (optional) low-pass filter SAR data
+3. manually load ecmwf data
+4. run calculations on per tile basis (scripts available in MSc_equations)
+5. (optional) plot wind directions on map
+5. (optional) plot estimated parameters on map
+
 """
 
 # %reset -f
@@ -17,7 +26,7 @@ os.chdir('C:/Python/AAA_GRS2/mscthesis')
 
 import MSc_equations as msc
 
-#%% load SAR data
+#%% manually load SAR data
 
 # path is the name of the relevant NRCS.nc file from snap
 path = 'NRCS.nc'
@@ -45,12 +54,12 @@ incident_original = np.array(incident_angle)
 msc.plottings(Sigma0_VV_original, samplerate[1], title = 'NRCS  $\sigma_0$')
 
 
-#%% apply custom low pass filter to image if desired (for instance if significant unwante high frequency signals are present)
+#%% (optional) low-pass filter SAR data (for instance if significant unwanted high frequency signals are present)
 
 # Sigma0_VV = msc.lowpass(Sigma0_VV, 51, samplerate[1]*3, samplerate[1], cmap = 'Greys_r', plotting = True)
 # Sigma0_VV_original = msc.lowpass(Sigma0_VV_original, 51, samplerate[1]*12, samplerate[1], cmap = 'Greys_r', plotting = True)
 
-#%% load ECMWF data
+#%% manually load ecmwf data
 
 # give name of ecmwf.nc file from S-1 OCN product containing only wind speed field and wind direction field
 path = 'ecmwf_carolina.nc' 
@@ -74,7 +83,7 @@ msc.plottings(np.array(netcdf_file['vv_001_owiEcmwfWindDirection'][:]), samplera
 print(r'ECMWF Wind origin w.r.t. North: %1.1f degrees' %direction_ecmwf_median + '+- %1.1f degrees' %direction_MAD_ecmwf)
 print(r'ECMWF Wind speed: %1.1f m/s' %np.mean(windspeed3) + '+- %1.1f m/s' %np.std(windspeed3))
 
-#%% tiled calculations 
+#%% run calculations on per tile basis (scripts available in MSc_equations)
 
 True_wind = None # determine wind direction manually (None) or input a-priori mean value or an array of wind directions equal 
                  # in size to that of the number of tiles (e.g. direction_ecmwf). Requires to load relevant ecmwf.nc file containing
@@ -86,6 +95,7 @@ dissip_rate =  1.0  # near-surface dissipation rate for loop 2B, values range be
 slope_multiplier = 1.0  # slope multiplier of mean wind field, multiplier of 1 means no multiplication
 form = 'rolls' # convection form, either cells or rolls
 
+# main script available in MSc_equations
 wind_origin, mean_lon, mean_lat, u_star, z_0, sigma_u1, sigma_u2, L1, L2, L3, w_star2, w_star2_std, Zi_estimated,\
     corr_fact1, corr_fact2, windspeed, tiles_lon, tiles_lat, idxKeep_tiles, hold_prediction, hold_form, epsilon,\
         H, dissip_rate_loop2B \
@@ -152,7 +162,7 @@ print('Form: %1.3f ' %(np.nansum(hold_form)/tiles_classified))
 print('Prediction: %1.2f ' %np.nanmean(hold_prediction) + '$\pm$ %1.2f' %np.nanstd(hold_prediction))
 print('ratio: %1.3f' %np.nanmedian(sigma_u2/u_star))
 
-#%% optionally plot wind direction on map
+#%% (optional) plot wind directions on map
 
 import cartopy
 import cartopy.crs as ccrs
@@ -188,7 +198,7 @@ msc.scale_bar(ax, 100)
 ax.quiver(mean_lon, mean_lat, v, u, scale=14, transform = crs)
 plt.show()
 
-#%% optionally plot other variables on map
+#%% (optional) plot estimated parameters on map
 
 import cartopy
 import cartopy.crs as ccrs
