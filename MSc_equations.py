@@ -652,7 +652,7 @@ def psd1D(image, samplerate, plotting= False, windowed = False, scaled = False, 
 
 #%% find peak in psd1D
  
-def sikora1997(windspeed, samplerate, window_length = 5, smoothing_fact = 3, windowed = True, plotting = False):
+def sikora1997(windspeed, samplerate, window_length = -9999, smoothing_fact = 2, windowed = True, plotting = False):
     from scipy.optimize import curve_fit
     from scipy import ndimage
     from scipy.signal import find_peaks
