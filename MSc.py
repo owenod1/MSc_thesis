@@ -240,7 +240,7 @@ cbar1 = ax.scatter(test0, test1, s = 1800, c = test2, cmap = 'magma', transform 
 cbaxes = fig.add_axes([0.92, 0.20, 0.03, 0.6]) 
 cbar_loc = plt.colorbar(cbar1, cax = cbaxes)  
 cbar_loc.set_label('Obukhov Length', fontsize=22, labelpad=10)
-yg.scale_bar(ax, 100)
+msc.scale_bar(ax, 100)
 
 plt.show()
 
