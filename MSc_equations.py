@@ -4,7 +4,7 @@ Created on Thu Feb 11 11:35:19 2021
 
 @author: Owen O'Driscoll
 
-this document contains the varies script sued to run the calculations instigated in MSc.py
+this document contains the varies script used to run the calculations instigated in MSc.py
 """
 
 # %reset -f
