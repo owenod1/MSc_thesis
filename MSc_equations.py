@@ -166,6 +166,34 @@ def MAD(data):
     MAD = np.nanmedian(abs(data - median))
     return MAD
 
+#%% calculate statistical significance using paired t-test
+
+def paired_t_test(method1, method2):
+    
+    # method following
+    # https://www.statstutor.ac.uk/resources/uploaded/paired-t-test.pdf
+        
+    # look up tables in 
+    # https://www.statisticshowto.com/tables/t-distribution-table/#two
+    # https://www.sjsu.edu/faculty/gerstman/StatPrimer/t-table.pdf    
+    
+    dif = method1 - method2
+    dif_mean = abs(np.nanmean(dif))
+    dif_std = np.nanstd(dif)
+    dif_standard_error = dif_std / np.sqrt(np.shape(dif)[0]-sum(np.isnan(dif)))
+    t = dif_mean / dif_standard_error
+    
+    return t
+
+#%% calculate coefficient of determination
+
+def coef_deter(method1, method2):
+    
+    correlation_matrix = np.corrcoef(method1, method2)
+    correlation_xy = correlation_matrix[0,1]
+    r_squared = correlation_xy**2
+    return r_squared
+
 
 #%% compute sampling rate
 
